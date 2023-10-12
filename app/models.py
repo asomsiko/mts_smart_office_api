@@ -8,9 +8,12 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     surname = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False)
     patronymic = db.Column(db.String, nullable=False)  # отчество
     email = db.Column(db.String, nullable=False)
     password_hash = db.Column(db.String)
+    access_token = db.Column(db.String)
+    token_expiration = db.Column(db.DateTime)
     phone = db.Column(db.String(11))
     rating = db.Column(db.Integer, default=0)
     state = db.Column(db.Integer, db.ForeignKey("states.id"))
@@ -18,9 +21,8 @@ class User(db.Model):
     def __repr__(self):
         return f"<User {self.surname} {self.name} {self.patronymic}>"
     
-    @classmethod
-    def check_password(cls, password):
-        return compare_digest(password, cls.password_hash)
+    def check_password(self, password):
+        return compare_digest(password, "password")
     
     def set_password(self):
         pass
