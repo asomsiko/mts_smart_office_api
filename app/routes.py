@@ -1,4 +1,4 @@
-from app import app, db, jwt
+from app import app, db, jwt, model
 from app.models import User
 
 from flask import jsonify
@@ -7,6 +7,17 @@ from flask import request
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import current_user
 from flask_jwt_extended import jwt_required
+
+import face_recognition
+from PIL import Image
+import os
+import pickle
+from PIL import Image
+import numpy as np
+from typing import List
+import onnxruntime as ort
+from insightface.app import FaceAnalysis
+import shutil
 
 
 #TODO: сделать апи для регистрации
@@ -44,3 +55,10 @@ def protected():
         name=current_user.name,
         surname=current_user.surname,
     )
+
+@app.route("/recognition", methods=["POST"])
+def recognition():
+    img = request.files['file']
+    img.save(os.path.join('app/save', img.filename))
+    predict = model.predict_face(os.path.join('app/save', img.filename))
+    return jsonify(predict = predict)
