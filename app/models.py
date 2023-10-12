@@ -1,5 +1,7 @@
 from app import db
 from hmac import compare_digest
+#TODO: разобраться с бэкрефами
+#TODO: починить все связи
 
 class User(db.Model):
     __tablename__ = "users"
@@ -10,11 +12,11 @@ class User(db.Model):
     patronymic = db.Column(db.String, nullable=False)  # отчество
     email = db.Column(db.String, nullable=False)
     password_hash = db.Column(db.String)
-    access_token = db.Column(db.String, nullable=False)
-    token_expiration = db.Column(db.DateTime, nullable=False)
+    access_token = db.Column(db.String)
+    token_expiration = db.Column(db.DateTime)
     phone = db.Column(db.String(11))
     rating = db.Column(db.Integer, default=0)
-    state = db.relationship('State', backref='state', nullable=False) # > states.id
+    state = db.Column(db.Integer, db.ForeignKey("states.id"))
 
     def __repr__(self):
         return f"<User {self.surname} {self.name} {self.patronymic}>"
@@ -28,7 +30,8 @@ class User(db.Model):
 class State(db.Model):
     __tablename__ = "states"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False, default="junior")
+    # user = db.relationship('User', backref='state')
 
     def __repr__(self):
         return f"<State {self.name}>"
@@ -38,8 +41,8 @@ class Advertisement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     body = db.Column(db.String, nullable=False)
-    customer = db.relationship('User', backref='customer', nullable=False)
-    employer = db.relationship('User', backref='employer', nullable=False)
+    customer = db.Column(db.Integer, db.ForeignKey("users.id"))
+    employer = db.Column(db.Integer, db.ForeignKey("users.id"))
     price = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
 
@@ -53,7 +56,7 @@ class Reminder(db.Model):
     body = db.Column(db.String, nullable=False)
     remind_at = db.Column(db.DateTime, nullable=False)
     deadline = db.Column(db.DateTime, nullable=False)
-    user_id = db.relationship('User', backref='user', nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
 
     def __repr__(self):
         return f"<Reminder {self.title}>"
@@ -64,7 +67,8 @@ class Device(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     api_key = db.Column(db.String(128), nullable=False)
-    location = db.relationship('Room', backref='room', nullable=False)
+    location = db.Column(db.Integer, db.ForeignKey("rooms.id"))
+
 
 class Room(db.Model):
     __tablename__ = "rooms"
@@ -78,7 +82,8 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     body = db.Column(db.String, nullable=False)
-    room_id = db.relationship('Room', backref='room', nullable=False)
+    room_id = db.Column(db.Integer, db.ForeignKey("rooms.id"))
+
 
 class Wish(db.Model):
     __tablename__ = "wishes"
