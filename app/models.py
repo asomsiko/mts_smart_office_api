@@ -1,5 +1,5 @@
 from app import db
-from hmac import compare_digest
+from werkzeug.security import check_password_hash, generate_password_hash
 
 class User(db.Model):
     __tablename__ = "users"
@@ -10,7 +10,7 @@ class User(db.Model):
     patronymic = db.Column(db.String, nullable=False)  # отчество
     email = db.Column(db.String, nullable=False)
     password_hash = db.Column(db.String)
-    phone = db.Column(db.String(11))
+    phone = db.Column(db.String(11), nullable=False)
     rating = db.Column(db.Integer, default=0)
     state = db.Column(db.Integer, db.ForeignKey("states.id"))
 
@@ -18,17 +18,14 @@ class User(db.Model):
         return f"<User {self.surname} {self.name} {self.patronymic}>"
     
     def check_password(self, password):
-        #TODO
-        return compare_digest(password, "password")
+        return check_password_hash(pwhash=self.password_hash, password=password)
     
-    def set_password(self):
-        pass
-
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password=password, method='pbkdf2:sha256')
 class State(db.Model):
     __tablename__ = "states"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, default="junior")
-    # user = db.relationship('User', backref='state')
 
     def __repr__(self):
         return f"<State {self.name}>"

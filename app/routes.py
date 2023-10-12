@@ -21,21 +21,8 @@ from insightface.app import FaceAnalysis
 import shutil
 
 
-#TODO: сделать апи для регистрации
-
-@jwt.user_identity_loader
-def user_identity_lookup(user):
-    return user.id
-
-@jwt.user_lookup_loader
-def user_lookup_callback(_jwt_header, jwt_data):
-    identity = jwt_data["sub"]
-    return User.query.filter_by(id=identity).one_or_none()
-
-
 @app.route('/signup', methods=['POST'])
 def signup_post():
-
     email = request.json.get('email')
     name = request.json.get('name')
     surname = request.json.get('surname')
@@ -43,36 +30,54 @@ def signup_post():
     phone = request.json.get('phone')
     rating = request.json.get('rating')
     state = request.json.get('state')
-    password = request.json.get('password_hash')
+    password = request.json.get('password')
+
+    if not email or not name or not surname or not patronymic or not password or not phone:
+        return jsonify({"error": "Missing required fields"}), 400
 
     user = User.query.filter_by(email=email).first()
     if user:
-        return jsonify({"error": "Email address already exists"}), 400
+        return jsonify({"error": "User with this email address already exists"}), 400
 
-    new_user = User(email=email, name=name, password_hash=generate_password_hash(password, method='pbkdf2:sha256'),
-        surname=surname, patronymic=patronymic, phone=phone, rating=rating, state=state)
-    access_token = create_access_token(identity=new_user)
-    refresh_token = create_refresh_token(identity=new_user)
-    db.session.add(new_user)
-    db.session.commit()
+    try:
+        new_user = User(
+        email=email, 
+        name=name, 
+        surname=surname, 
+        patronymic=patronymic, 
+        phone=phone, 
+        rating=rating, 
+        state=state
+        )
+        new_user.set_password(password=password)
+        db.session.add(new_user)
+        db.session.commit()
 
-    return jsonify({"message": "User created", "access_token": access_token, "refresh_token": refresh_token}), 201
+        access_token = create_access_token(identity=new_user.id)
+        refresh_token = create_refresh_token(identity=new_user.id)
 
+        return jsonify({"message": "User created", "access_token": access_token, "refresh_token": refresh_token}), 201
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+    
 @app.route('/login', methods=['POST'])
 def login():
-    #TODO: функция которая сырой пароль сравнивает с хэшем
     email = request.json.get('email')
     password = request.json.get('password')
-    password = generate_password_hash(password, method='pbkdf2:sha256')
+
+    if not email or not password:
+        return jsonify({"error": "Missing required fields"}), 400
+
     user = User.query.filter_by(email=email).first()
-    if not user or not User.check_password(password=password):
+    if not user or not user.check_password(password=password):
         return jsonify({"error": "Bad login credentials"}), 401
-    
-    access_token = create_access_token(identity=user)
-    refresh_token = create_refresh_token(identity=user)
 
+    access_token = create_access_token(identity=user.id)
+    refresh_token = create_refresh_token(identity=user.id)
     return jsonify({"access_token": access_token, "refresh_token": refresh_token}), 200
-
+    
 @app.route("/recognition", methods=["POST"])
 def recognition():
     img = request.files['file']
