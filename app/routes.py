@@ -84,3 +84,4 @@ def recognition():
     img.save(os.path.join('app/save', img.filename))
     predict = model.predict_face(os.path.join('app/save', img.filename))
     return jsonify(predict = predict)
+

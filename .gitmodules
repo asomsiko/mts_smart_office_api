@@ -1,3 +1,0 @@
-[submodule "ai/FaceRecognitionModel"]
-	path = ai/FaceRecognitionModel
-	url = https://github.com/Talich12/FaceRecognitionModel.git

@@ -15,7 +15,7 @@ from insightface.app import FaceAnalysis
 import shutil
 from flask_migrate import Migrate
 
-from ai.FaceRecognitionModel.face_recognition import Model
+from FaceRecognitionModel.face_recognition import Model
 app = Flask(__name__)
 
 app.config["JWT_SECRET_KEY"] = "super-pizdec-secret"
