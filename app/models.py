@@ -1,7 +1,5 @@
 from app import db
 from hmac import compare_digest
-#TODO: разобраться с бэкрефами
-#TODO: починить все связи
 
 class User(db.Model):
     __tablename__ = "users"
@@ -12,8 +10,6 @@ class User(db.Model):
     patronymic = db.Column(db.String, nullable=False)  # отчество
     email = db.Column(db.String, nullable=False)
     password_hash = db.Column(db.String)
-    access_token = db.Column(db.String)
-    token_expiration = db.Column(db.DateTime)
     phone = db.Column(db.String(11))
     rating = db.Column(db.Integer, default=0)
     state = db.Column(db.Integer, db.ForeignKey("states.id"))
@@ -22,6 +18,7 @@ class User(db.Model):
         return f"<User {self.surname} {self.name} {self.patronymic}>"
     
     def check_password(self, password):
+        #TODO
         return compare_digest(password, "password")
     
     def set_password(self):
