@@ -29,7 +29,6 @@ class State(db.Model):
 
     def __repr__(self):
         return f"<State {self.name}>"
-
 class Advertisement(db.Model):
     __tablename__ = "advertisements"
     id = db.Column(db.Integer, primary_key=True)
@@ -42,7 +41,6 @@ class Advertisement(db.Model):
 
     def __repr__(self):
         return f"<Advertisement {self.title}>"
-
 class Reminder(db.Model):
     __tablename__ = "reminders"
     id = db.Column(db.Integer, primary_key=True)
@@ -54,31 +52,24 @@ class Reminder(db.Model):
 
     def __repr__(self):
         return f"<Reminder {self.title}>"
-
-
 class Device(db.Model):
     __tablename__ = "devices"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     api_key = db.Column(db.String(128), nullable=False)
     location = db.Column(db.Integer, db.ForeignKey("rooms.id"))
-
-
 class Room(db.Model):
     __tablename__ = "rooms"
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String, default="Work")
     name = db.Column(db.String)
     people_count = db.Column(db.Integer)
-
 class Order(db.Model):
     __tablename__ = "orders"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     body = db.Column(db.String, nullable=False)
     room_id = db.Column(db.Integer, db.ForeignKey("rooms.id"))
-
-
 class Wish(db.Model):
     __tablename__ = "wishes"
     id = db.Column(db.Integer, primary_key=True)
@@ -95,7 +86,6 @@ class RoomSchema(ma.SQLAlchemySchema):
     type = ma.auto_field()
     name = ma.auto_field()
     people_count = ma.auto_field()
-
 class StateSchema(ma.SQLAlchemySchema):
     class Meta:
         model = State
@@ -103,8 +93,6 @@ class StateSchema(ma.SQLAlchemySchema):
 
     id = ma.auto_field()
     name = ma.auto_field()
-
-
 class UserSchema(ma.SQLAlchemySchema):
     class Meta:
         model = User
@@ -118,7 +106,6 @@ class UserSchema(ma.SQLAlchemySchema):
     phone = ma.auto_field()
     rating = ma.auto_field()
     state = fields.Nested(StateSchema)
-
 class AdvertisementSchema(ma.SQLAlchemySchema):
     class Meta:
         model = Advertisement
@@ -131,7 +118,6 @@ class AdvertisementSchema(ma.SQLAlchemySchema):
     employer = fields.Nested(UserSchema)
     price = ma.auto_field()
     created_at = ma.auto_field()
-
 class ReminderSchema(ma.SQLAlchemySchema):
     class Meta:
         model = Reminder
@@ -143,7 +129,6 @@ class ReminderSchema(ma.SQLAlchemySchema):
     remind_at = ma.auto_field()
     deadline = ma.auto_field()
     user_id = fields.Nested(UserSchema)
-
 class DeviceSchema(ma.SQLAlchemySchema):
     class Meta:
         model = Device
@@ -153,7 +138,6 @@ class DeviceSchema(ma.SQLAlchemySchema):
     name = ma.auto_field()
     api_key = ma.auto_field()
     location = fields.Nested(RoomSchema)
-
 class OrderSchema(ma.SQLAlchemySchema):
     class Meta:
         model = Order
@@ -163,7 +147,6 @@ class OrderSchema(ma.SQLAlchemySchema):
     title = ma.auto_field()
     body = ma.auto_field()
     room_id = fields.Nested(RoomSchema)
-
 class WishSchema(ma.SQLAlchemySchema):
     class Meta:
         model = Wish
