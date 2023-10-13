@@ -2,17 +2,64 @@ from app import app
 from flask import jsonify, request
 from app.models import *
 
+@app.route("/sorted-devices", methods=["GET"])
+def get_sorted_devices():
+    """
+    Возвращает список устройств, отсортированных по переданному в URL полю.
+    
+    Параметры:
+    sort (string): Имя поля, по которому нужно отсортировать устройства.
+    
+    Возвращает:
+    sorted_devices: Список устройств в формате JSON.
+    """
+    sort_field = request.args.get('sort')
+    if sort_field is None: 
+        query =  Device.query.all()
+        device_schema = DeviceSchema(many = True)
+        response = device_schema.dump(query)
+        return jsonify(response)
+    query = Device.query.order_by(getattr(Device, sort_field)).all()
+    device_schema = DeviceSchema(many = True)
+    sorted_devices = device_schema.dump(query)
+    return jsonify(sorted_devices)
+
+
+@app.route("/filtered-devices", methods=["GET"])
+def get_filtered_devices():
+    """
+    Возвращает список  устройств, отфильтрованных по переданному в URL полю.
+    
+    Параметры:
+    filter (string): Имя поля, по которому нужно отфильтровать устройства.
+    value (string): Значение поля filter, по которому будут фильтроваться устройства.
+
+    
+    Возвращает:
+    filtered_devices: Список устройств в формате JSON.
+    """
+    filter_field = request.args.get('filter')
+    filter_value = request.args.get('value')
+    if filter_field == None:
+        query =  Device.query.all()
+        device_schema = DeviceSchema(many = True)
+        response = device_schema.dump(query)
+        return jsonify(response)   
+    query = Device.query.filter_by(**{filter_field: filter_value}).all()
+    device_schema = DeviceSchema(many = True)
+    filtered_devices = device_schema.dump(query)
+    return jsonify(filtered_devices)
 
 @app.route("/sorted-reminders", methods=["GET"])
 def get_sorted_reminders():
     """
-    Возвращает список напомиананий, отсортированных по переданному в URL полю.
+    Возвращает список напоминаний, отсортированных по переданному в URL полю.
     
     Параметры:
-    sort (string): Имя поля, по которому нужно отсортировать напомианания.
+    sort (string): Имя поля, по которому нужно отсортировать напоминания.
     
     Возвращает:
-    sorted_advertisements: Список напомиананий в формате JSON.
+    sorted_advertisements: Список напоминаний в формате JSON.
     """
     sort_field = request.args.get('sort')
     if sort_field is None: 
