@@ -3,6 +3,59 @@ from flask import jsonify, request
 from app.models import *
 
 
+@app.route("/sorted-orders", methods=["GET"])
+def get_sorted_orders():
+    """
+    Возвращает список заказов, отсортированных по переданному в URL полю.
+    
+    Параметры:
+    sort (string): Имя поля, по которому нужно отсортировать заказы.
+    
+    Возвращает:
+    sorted_orders: Список заказов в формате JSON.
+    """
+    sort_field = request.args.get('sort')
+    if sort_field is None: 
+        query =  Order.query.all()
+        order_schema = OrderSchema(many = True)
+        response = order_schema.dump(query)
+        return jsonify(response)
+    query = Order.query.order_by(getattr(Order, sort_field)).all()
+    order_schema = OrderSchema(many = True)
+    sorted_orders = order_schema.dump(query)
+    return jsonify(sorted_orders)
+
+@app.route("/filtered-orders", methods=["GET"])
+def get_filtered_orders():
+    """
+    Возвращает список заказов, отфильтрованных по переданному в URL полю.
+    
+    Параметры:
+    filter (string): Имя поля, по которому нужно отфильтровать заказы.
+    value (string): Значение поля filter, по которому будут фильтроваться заказы.
+
+    
+    Возвращает:
+    filtered_orders: Список заказов в формате JSON.
+    """
+    filter_field = request.args.get('filter')
+    filter_value = request.args.get('value')
+    if filter_field == None:
+        query =  Order.query.all()
+        order_schema = OrderSchema(many = True)
+        response = order_schema.dump(query)
+        return jsonify(response)
+    elif filter_field == "room_id":
+        filter_value = Room.query.filter(Room.id == filter_value).one_or_none()
+        if filter_value is None:
+            return jsonify(error="Несуществующая комната")
+        filter_value = filter_value.id
+
+    query = Order.query.filter_by(**{filter_field: filter_value}).all()
+    order_schema = OrderSchema(many = True)
+    filtered_orders = order_schema.dump(query)
+    return jsonify(filtered_orders)
+
 @app.route("/sorted-rooms", methods=["GET"])
 def get_sorted_rooms():
     """
