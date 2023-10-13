@@ -2,6 +2,54 @@ from app import app
 from flask import jsonify, request
 from app.models import *
 
+
+@app.route("/sorted-reminders", methods=["GET"])
+def get_sorted_reminders():
+    """
+    Возвращает список напомиананий, отсортированных по переданному в URL полю.
+    
+    Параметры:
+    sort (string): Имя поля, по которому нужно отсортировать напомианания.
+    
+    Возвращает:
+    sorted_advertisements: Список напомиананий в формате JSON.
+    """
+    sort_field = request.args.get('sort')
+    if sort_field is None: 
+        query =  Reminder.query.all()
+        reminder_schema = ReminderSchema(many = True)
+        response = reminder_schema.dump(query)
+        return jsonify(response)
+    query = Reminder.query.order_by(getattr(Reminder, sort_field)).all()
+    reminder_schema = ReminderSchema(many = True)
+    sorted_reminders = reminder_schema.dump(query)
+    return jsonify(sorted_reminders)
+
+@app.route("/filtered-reminders", methods=["GET"])
+def get_filtered_reminders():
+    """
+    Возвращает список  напоминаний, отфильтрованных по переданному в URL полю.
+    
+    Параметры:
+    filter (string): Имя поля, по которому нужно отфильтровать напоминания.
+    value (string): Значение поля filter, по которому будут фильтроваться напоминания.
+
+    
+    Возвращает:
+    filtered_reminders: Список напоминаний в формате JSON.
+    """
+    filter_field = request.args.get('filter')
+    filter_value = request.args.get('value')
+    if filter_field == None:
+        query =  Reminder.query.all()
+        reminder_schema = ReminderSchema(many = True)
+        response = reminder_schema.dump(query)
+        return jsonify(response)   
+    query = Reminder.query.filter_by(**{filter_field: filter_value}).all()
+    reminder_schema = AdvertisementSchema(many = True)
+    filtered_reminders = reminder_schema.dump(query)
+    return jsonify(filtered_reminders)
+
 @app.route("/sorted-advertisements", methods=["GET"])
 def get_sorted_advertisements():
     """
