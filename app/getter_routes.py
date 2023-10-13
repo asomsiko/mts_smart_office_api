@@ -2,6 +2,54 @@ from app import app
 from flask import jsonify, request
 from app.models import *
 
+
+@app.route("/sorted-rooms", methods=["GET"])
+def get_sorted_rooms():
+    """
+    Возвращает список комнат, отсортированных по переданному в URL полю.
+    
+    Параметры:
+    sort (string): Имя поля, по которому нужно отсортировать комнаты.
+    
+    Возвращает:
+    sorted_devices: Список комнат в формате JSON.
+    """
+    sort_field = request.args.get('sort')
+    if sort_field is None: 
+        query =  Room.query.all()
+        room_schema = RoomSchema(many = True)
+        response = room_schema.dump(query)
+        return jsonify(response)
+    query = Room.query.order_by(getattr(Room, sort_field)).all()
+    room_schema = RoomSchema(many = True)
+    sorted_rooms = room_schema.dump(query)
+    return jsonify(sorted_rooms)
+
+@app.route("/filtered-rooms", methods=["GET"])
+def get_filtered_rooms():
+    """
+    Возвращает список  комнат, отфильтрованных по переданному в URL полю.
+    
+    Параметры:
+    filter (string): Имя поля, по которому нужно отфильтровать комнаты.
+    value (string): Значение поля filter, по которому будут фильтроваться комнаты.
+
+    
+    Возвращает:
+    filtered_rooms: Список комнат в формате JSON.
+    """
+    filter_field = request.args.get('filter')
+    filter_value = request.args.get('value')
+    if filter_field == None:
+        query =  Room.query.all()
+        room_schema = RoomSchema(many = True)
+        response = room_schema.dump(query)
+        return jsonify(response)   
+    query = Room.query.filter_by(**{filter_field: filter_value}).all()
+    room_schema = RoomSchema(many = True)
+    filtered_rooms = room_schema.dump(query)
+    return jsonify(filtered_rooms)
+
 @app.route("/sorted-devices", methods=["GET"])
 def get_sorted_devices():
     """
