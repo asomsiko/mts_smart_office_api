@@ -1,24 +1,11 @@
-from app import app, db, jwt, model
+from app import app, db, jwt
 from app.models import User
 
 from flask import jsonify
 from flask import request
 
 from flask_jwt_extended import create_access_token, create_refresh_token
-from flask_jwt_extended import current_user
 from flask_jwt_extended import jwt_required
-
-from werkzeug.security import generate_password_hash
-
-import face_recognition
-from PIL import Image
-import os
-import pickle
-import numpy as np
-from typing import List
-import onnxruntime as ort
-from insightface.app import FaceAnalysis
-import shutil
 
 
 @app.route('/signup', methods=['POST'])
@@ -77,11 +64,3 @@ def login():
     access_token = create_access_token(identity=user.id)
     refresh_token = create_refresh_token(identity=user.id)
     return jsonify({"access_token": access_token, "refresh_token": refresh_token}), 200
-    
-@app.route("/recognition", methods=["POST"])
-def recognition():
-    img = request.files['file']
-    img.save(os.path.join('app/save', img.filename))
-    predict = model.predict_face(os.path.join('app/save', img.filename))
-    return jsonify(predict = predict)
-
