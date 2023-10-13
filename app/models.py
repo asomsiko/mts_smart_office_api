@@ -34,8 +34,8 @@ class Advertisement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     body = db.Column(db.String, nullable=False)
-    customer = db.Column(db.Integer, db.ForeignKey("users.id"))
-    employer = db.Column(db.Integer, db.ForeignKey("users.id"))
+    customer = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    employer = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     price = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
 
@@ -74,6 +74,7 @@ class Wish(db.Model):
     __tablename__ = "wishes"
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     
 
@@ -154,3 +155,4 @@ class WishSchema(ma.SQLAlchemySchema):
 
     id = ma.auto_field()
     content = ma.auto_field()
+    user_id = fields.Nested(UserSchema)
