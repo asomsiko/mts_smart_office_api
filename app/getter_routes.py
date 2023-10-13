@@ -3,6 +3,13 @@ from flask import jsonify, request
 from app.models import *
 
 
+@app.route("/wishes", methods=["GET"])
+def get_wishes():
+    query = Wish.query.all()
+    wish_schema = WishSchema(many = True)
+    response = wish_schema.dump(query)
+    return jsonify(response)
+
 @app.route("/sorted-orders", methods=["GET"])
 def get_sorted_orders():
     """
