@@ -45,6 +45,7 @@ def get_filtered_orders():
         order_schema = OrderSchema(many = True)
         response = order_schema.dump(query)
         return jsonify(response)
+    
     elif filter_field == "room_id":
         filter_value = Room.query.filter(Room.id == filter_value).one_or_none()
         if filter_value is None:
@@ -141,11 +142,18 @@ def get_filtered_devices():
     """
     filter_field = request.args.get('filter')
     filter_value = request.args.get('value')
-    if filter_field == None:
+    if filter_field is None:
         query =  Device.query.all()
         device_schema = DeviceSchema(many = True)
         response = device_schema.dump(query)
-        return jsonify(response)   
+        return jsonify(response)
+    
+    elif filter_field == "location":
+        filter_value = Room.query.filter(Room.id == filter_value).one_or_none()
+        if filter_value is None:
+            return jsonify(error="Несуществующая комната")
+        filter_value = filter_value.id
+
     query = Device.query.filter_by(**{filter_field: filter_value}).all()
     device_schema = DeviceSchema(many = True)
     filtered_devices = device_schema.dump(query)
@@ -188,11 +196,19 @@ def get_filtered_reminders():
     """
     filter_field = request.args.get('filter')
     filter_value = request.args.get('value')
-    if filter_field == None:
+
+    if filter_field is None:
         query =  Reminder.query.all()
         reminder_schema = ReminderSchema(many = True)
         response = reminder_schema.dump(query)
-        return jsonify(response)   
+        return jsonify(response)
+    
+    elif filter_field == "user_id":
+        filter_value = User.query.filter(User.id == filter_value).one_or_none()
+        if filter_value is None:
+            return jsonify(error="Несуществующий пользователь")
+        filter_value = filter_value.id
+
     query = Reminder.query.filter_by(**{filter_field: filter_value}).all()
     reminder_schema = AdvertisementSchema(many = True)
     filtered_reminders = reminder_schema.dump(query)
@@ -239,7 +255,20 @@ def get_filtered_advertisements():
         query =  Advertisement.query.all()
         advertisement_schema = AdvertisementSchema(many = True)
         response = advertisement_schema.dump(query)
-        return jsonify(response)   
+        return jsonify(response)
+    
+    elif filter_field == "customer":
+        filter_value = User.query.filter(User.id == filter_value).one_or_none()
+        if filter_value is None:
+            return jsonify(error="Несуществующий пользователь")
+        filter_value = filter_value.id
+    
+    elif filter_field == "employer":
+        filter_value = User.query.filter(User.id == filter_value).one_or_none()
+        if filter_value is None:
+            return jsonify(error="Несуществующий пользователь")
+        filter_value = filter_value.id
+
     query = Advertisement.query.filter_by(**{filter_field: filter_value}).all()
     advertisement_schema = AdvertisementSchema(many = True)
     filtered_advertisements = advertisement_schema.dump(query)
@@ -339,13 +368,18 @@ def get_filtered_users():
     """
     filter_field = request.args.get('filter')
     filter_value = request.args.get('value')
-    if filter_field == "state":
-        filter_value = State.query.filter(State.name == filter_value).one_or_none().id
     if filter_field is None:
         query =  User.query.all()
         user_schema = UserSchema(many = True)
         response = user_schema.dump(query)
-        return jsonify(response)    
+        return jsonify(response)
+    
+    elif filter_field == "state":
+        filter_value = State.query.filter(State.name == filter_value).one_or_none()
+        if filter_value is None:
+            return jsonify(error="Несуществующий штат")
+        filter_value = filter_value.id
+
     query = User.query.filter_by(**{filter_field: filter_value}).all()
     user_schema = UserSchema(many = True)
     filtered_users = user_schema.dump(query)
