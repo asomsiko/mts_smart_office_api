@@ -2,6 +2,15 @@ from app import app
 from flask import jsonify, request
 from app.models import *
 
+@app.route("/states", methods=["GET"])
+def get_states():
+    """
+    Возвращает список штатов сотрудников.
+    """
+    query =  State.query.all()
+    state_schema = StateSchema(many = True)
+    response = state_schema.dump(query)
+    return jsonify(response)   
 
 @app.route("/filtered-rooms", methods=["GET"])
 def get_filtered_rooms():
