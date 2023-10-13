@@ -2,6 +2,53 @@ from app import app
 from flask import jsonify, request
 from app.models import *
 
+@app.route("/sorted-advertisements", methods=["GET"])
+def get_sorted_advertisements():
+    """
+    Возвращает список объявлений, отсортированных по переданному в URL полю.
+    
+    Параметры:
+    sort (string): Имя поля, по которому нужно отсортировать объявления.
+    
+    Возвращает:
+    sorted_advertisements: Список объявлений в формате JSON.
+    """
+    sort_field = request.args.get('sort')
+    if sort_field is None: 
+        query =  Advertisement.query.all()
+        advertisement_schema = AdvertisementSchema(many = True)
+        response = advertisement_schema.dump(query)
+        return jsonify(response)
+    query = Advertisement.query.order_by(getattr(Advertisement, sort_field)).all()
+    advertisement_schema = AdvertisementSchema(many = True)
+    sorted_advertisements = advertisement_schema.dump(query)
+    return jsonify(sorted_advertisements)
+
+@app.route("/filtered-advertisements", methods=["GET"])
+def get_filtered_advertisements():
+    """
+    Возвращает список  объявлений, отфильтрованных по переданному в URL полю.
+    
+    Параметры:
+    filter (string): Имя поля, по которому нужно отфильтровать объявления.
+    value (string): Значение поля filter, по которому будут фильтроваться объявления.
+
+    
+    Возвращает:
+    filtered_advertisements: Список объявлений в формате JSON.
+    """
+    filter_field = request.args.get('filter')
+    filter_value = request.args.get('value')
+    if filter_field == None:
+        query =  Advertisement.query.all()
+        advertisement_schema = AdvertisementSchema(many = True)
+        response = advertisement_schema.dump(query)
+        return jsonify(response)   
+    query = Advertisement.query.filter_by(**{filter_field: filter_value}).all()
+    advertisement_schema = AdvertisementSchema(many = True)
+    filtered_advertisements = advertisement_schema.dump(query)
+    return jsonify(filtered_advertisements)
+
 @app.route("/states", methods=["GET"])
 def get_states():
     """
