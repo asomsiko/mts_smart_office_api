@@ -25,8 +25,8 @@ def get_sorted_achivements():
     sorted_achivements = order_schema.dump(query)
     return jsonify(sorted_achivements)
 
-@app.route("/filtered-orders", methods=["GET"])
-def get_filtered_orders():
+@app.route("/filtered-achivements", methods=["GET"])
+def get_filtered_achivements():
     """
     Возвращает список достижений, отфильтрованных по переданному в URL полю.
     
