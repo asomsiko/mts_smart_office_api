@@ -3,6 +3,21 @@ from flask import jsonify, request
 from app.models import *
 from sqlalchemy.orm import joinedload
 
+
+@app.route("/work-rooms", methods=["GET"])
+def get_work_rooms():
+    query = Room.query.filter(Room.type == "Work").all()
+    room_chema = RoomSchema(many = True)
+    response = room_chema.dump(query)
+    return jsonify(response)
+
+@app.route("/relax-rooms", methods=["GET"])
+def get_relax_rooms():
+    query = Room.query.filter(Room.type == "Relax").all()
+    room_chema = RoomSchema(many = True)
+    response = room_chema.dump(query)
+    return jsonify(response)
+
 @app.route("/complaints", methods=["GET"])
 def get_complaints():
     query = Complaint.query.options(joinedload(Complaint.sender), joinedload(Complaint.target)).all()
