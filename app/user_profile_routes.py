@@ -12,8 +12,8 @@ def user_lookup_callback(_jwt_header, jwt_data):
 @app.route("/user-profile", methods=["GET"])
 @jwt_required(refresh=True)
 def user_profile():
-    user = get_jwt_identity()
-    user = User.query.filter(User.id == user)
+    user_id = get_jwt_identity()
+    user = User.query.filter(User.id == user_id)
     user_schema = UserSchema(many = True)
     response = user_schema.dump(user)
     if user.one().is_manager:
