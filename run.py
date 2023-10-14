@@ -5,6 +5,10 @@ from flask_admin.contrib.sqla import ModelView
 class UserView(ModelView):
     form_columns = ('name', 'surname', 'patronymic', 'email', 'phone', 'rating', 'state_id')
     column_list = ('name', 'surname', 'patronymic', 'email', 'phone', 'rating', 'state_id')
+
+class AchivementView(ModelView):
+    form_columns = ('title', 'description', 'date_achieved', 'user_id')
+    column_list = ('title', 'description', 'date_achieved', 'user_id')
 class AdvertisementView(ModelView):
     form_columns = ('title', 'body', 'customer_id', 'employer_id', 'price', 'created_at')
     column_list = ('title', 'body', 'customer_id', 'employer_id', 'price', 'created_at')
@@ -40,6 +44,7 @@ with app.app_context():
     admin.add_view(OrderView(Order, db.session))
     admin.add_view(WishView(Wish, db.session))
     admin.add_view(ComplaintView(Complaint, db.session))
+    admin.add_view(AchivementView(Achivement, db.session))
 
 
     app.run(host="0.0.0.0", port=3000, debug=True)

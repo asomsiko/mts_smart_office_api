@@ -3,6 +3,53 @@ from flask import jsonify, request
 from app.models import *
 from sqlalchemy.orm import joinedload
 
+@app.route("/sorted-achivements", methods=["GET"])
+def get_sorted_achivements():
+    """
+    Возвращает список достижений, отсортированных по переданному в URL полю.
+    
+    Параметры:
+    sort (string): Имя поля, по которому нужно отсортировать достижения.
+    
+    Возвращает:
+    sorted_achivements: Список достижений в формате JSON.
+    """
+    sort_field = request.args.get('sort')
+    if sort_field is None: 
+        query =  Achivement.query.options(joinedload(Achivement.owner)).all()
+        achivement_schema = AchivementSchema(many = True)
+        response = achivement_schema.dump(query)
+        return jsonify(response)
+    query = Achivement.query.options(joinedload(Order.room)).order_by(getattr(Order, sort_field)).all()
+    order_schema = AchivementSchema(many = True)
+    sorted_achivements = order_schema.dump(query)
+    return jsonify(sorted_achivements)
+
+@app.route("/filtered-orders", methods=["GET"])
+def get_filtered_orders():
+    """
+    Возвращает список достижений, отфильтрованных по переданному в URL полю.
+    
+    Параметры:
+    filter (string): Имя поля, по которому нужно отфильтровать достижения.
+    value (string): Значение поля filter, по которому будут фильтроваться достижения.
+
+    
+    Возвращает:
+    filtered_achivements: Список достижений в формате JSON.
+    """
+    filter_field = request.args.get('filter')
+    filter_value = request.args.get('value')
+    if filter_field is None:
+        query =  Achivement.query.options(joinedload(Achivement.owner)).all()
+        achivement_schema = AchivementSchema(many = True)
+        response = achivement_schema.dump(query)
+        return jsonify(response)
+
+    query = Achivement.query.filter_by(**{filter_field: filter_value}).all()
+    achivement_schema = AchivementSchema(many = True)
+    filtered_achivements = achivement_schema.dump(query)
+    return jsonify(filtered_achivements)
 
 @app.route("/work-rooms", methods=["GET"])
 def get_work_rooms():

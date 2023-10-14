@@ -91,6 +91,17 @@ class Complaint(db.Model):
 
     sender = db.relationship("User", foreign_keys=[sender_id])
     target = db.relationship("User", foreign_keys=[target_id])
+
+class Achivement(db.Model):
+    __tablename__ = "achivements"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    title = db.Column(db.String(100))
+    description = db.Column(db.String(200))
+    date_achieved = db.Column(db.DateTime)
+    owner = db.relationship("User", foreign_keys=[user_id])
+    
+
 class StateSchema(ma.SQLAlchemySchema):
     class Meta:
         model = State
@@ -111,6 +122,17 @@ class UserSchema(ma.SQLAlchemySchema):
     phone = ma.auto_field()
     rating = ma.auto_field()
     state = fields.Nested(StateSchema)
+
+class AchivementSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = Achivement
+        load_instance = True
+
+    id = ma.auto_field()
+    title = ma.auto_field()
+    description = ma.auto_field()
+    date_achieved = ma.auto_field()
+    owner = fields.Nested(UserSchema)
 
 class ComplaintSchema(ma.SQLAlchemySchema):
     class Meta:
