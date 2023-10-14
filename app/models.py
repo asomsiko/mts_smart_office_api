@@ -6,14 +6,14 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     surname = db.Column(db.String, nullable=False)
-    name = db.Column(db.String, nullable=False)
     patronymic = db.Column(db.String, nullable=False)  # отчество
     email = db.Column(db.String, nullable=False)
     password_hash = db.Column(db.String)
     phone = db.Column(db.String(11), nullable=False)
     rating = db.Column(db.Integer, default=0)
-    state = db.Column(db.Integer, db.ForeignKey("states.id"))
-
+    state_id = db.Column(db.Integer, db.ForeignKey("states.id"))
+    state = db.relationship("State", foreign_keys=[state_id])
+    is_manager = db.Column(db.Boolean)
     def __repr__(self):
         return f"<User {self.surname} {self.name} {self.patronymic}>"
     
@@ -34,8 +34,11 @@ class Advertisement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     body = db.Column(db.String, nullable=False)
-    customer = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    employer = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    customer_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    employer_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    customer = db.relationship("User", foreign_keys=[customer_id])
+    employer = db.relationship("User", foreign_keys=[employer_id])
+
     price = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
 
@@ -49,7 +52,7 @@ class Reminder(db.Model):
     remind_at = db.Column(db.DateTime, nullable=False)
     deadline = db.Column(db.DateTime, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-
+    owner = db.relationship("User", foreign_keys=[user_id])
     def __repr__(self):
         return f"<Reminder {self.title}>"
 class Device(db.Model):
@@ -57,7 +60,8 @@ class Device(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     api_key = db.Column(db.String(128), nullable=False)
-    location = db.Column(db.Integer, db.ForeignKey("rooms.id"))
+    location_id = db.Column(db.Integer, db.ForeignKey("rooms.id"))
+    location = db.relationship("Room", foreign_keys=[location_id])
 class Room(db.Model):
     __tablename__ = "rooms"
     id = db.Column(db.Integer, primary_key=True)
@@ -70,12 +74,14 @@ class Order(db.Model):
     title = db.Column(db.String, nullable=False)
     body = db.Column(db.String, nullable=False)
     room_id = db.Column(db.Integer, db.ForeignKey("rooms.id"))
+    room = db.relationship("Room", foreign_keys=[room_id])
 class Wish(db.Model):
     __tablename__ = "wishes"
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-
+    owner = db.relationship("User", foreign_keys=[user_id])
+    
 class Complaint(db.Model):
     __tablename__ = "complaints"
     id = db.Column(db.Integer, primary_key=True)
