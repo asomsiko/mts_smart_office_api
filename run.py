@@ -22,6 +22,9 @@ class WishView(ModelView):
     form_columns = ('content', 'user_id')
     column_list = ('content', 'user_id')
 
+class ComplaintView(ModelView):
+    form_columns = ('content', 'sender_id', 'target_id')
+    column_list = ('content', 'sender_id', 'target_id')
 
 with app.app_context():
     db.create_all()
@@ -33,6 +36,7 @@ with app.app_context():
     admin.add_view(ModelView(Room, db.session))
     admin.add_view(OrderView(Order, db.session))
     admin.add_view(WishView(Wish, db.session))
+    admin.add_view(ComplaintView(Complaint, db.session))
 
 
-    app.run(host="localhost", port=3000, debug=True)
+    app.run(host="0.0.0.0", port=3000, debug=True)

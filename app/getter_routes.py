@@ -1,6 +1,14 @@
 from app import app
 from flask import jsonify, request
 from app.models import *
+from sqlalchemy.orm import joinedload
+
+@app.route("/complaints", methods=["GET"])
+def get_complaints():
+    query = Complaint.query.options(joinedload(Complaint.sender), joinedload(Complaint.target)).all()
+    complaint_schema = ComplaintSchema(many = True)
+    response = complaint_schema.dump(query)
+    return jsonify(response)
 
 
 @app.route("/wishes", methods=["GET"])

@@ -76,17 +76,15 @@ class Wish(db.Model):
     content = db.Column(db.String, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
-    
+class Complaint(db.Model):
+    __tablename__ = "complaints"
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.String, nullable=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    target_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
-class RoomSchema(ma.SQLAlchemySchema):
-    class Meta:
-        model = Room
-        load_instance = True
-
-    id = ma.auto_field()
-    type = ma.auto_field()
-    name = ma.auto_field()
-    people_count = ma.auto_field()
+    sender = db.relationship("User", foreign_keys=[sender_id])
+    target = db.relationship("User", foreign_keys=[target_id])
 class StateSchema(ma.SQLAlchemySchema):
     class Meta:
         model = State
@@ -107,6 +105,26 @@ class UserSchema(ma.SQLAlchemySchema):
     phone = ma.auto_field()
     rating = ma.auto_field()
     state = fields.Nested(StateSchema)
+
+class ComplaintSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = Complaint
+        load_instance = True
+
+    id = ma.auto_field()
+    content = ma.auto_field()
+    sender = fields.Nested(UserSchema)
+    target = fields.Nested(UserSchema)
+
+class RoomSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = Room
+        load_instance = True
+
+    id = ma.auto_field()
+    type = ma.auto_field()
+    name = ma.auto_field()
+    people_count = ma.auto_field()
 class AdvertisementSchema(ma.SQLAlchemySchema):
     class Meta:
         model = Advertisement
