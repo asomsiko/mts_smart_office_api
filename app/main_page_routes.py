@@ -1,5 +1,7 @@
-from app import app
-from flask_jwt_extended import jwt_required
+from app import app, db
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask import request, jsonify
+from app.models import Complaint, ComplaintSchema, User
 
 @app.route("/services", methods=["GET"])
 @jwt_required(refresh=True)
@@ -26,10 +28,30 @@ def yandex():
 def service_order():
     pass
 
-@app.route("/services/complaint", methods=["GET"])
+@app.route("/services/complaint", methods=["POST"])
 @jwt_required(refresh=True)
 def complaint():
-    pass
+    user_id = get_jwt_identity()
+    content = request.json.get('content').strip()
+    sender = user_id
+    target = request.json.get('target_id')
+
+    try:
+        complaint = Complaint(
+            content = content,
+            sender_id = sender,
+            target_id = target
+        )
+        complaint.sender = User.query.filter_by(id=sender).one()
+        complaint.target = User.query.filter_by(id=target).one()
+        db.session.add(complaint)
+        db.session.commit()
+        return jsonify(message='Complaint created', complaint=ComplaintSchema(many = True).dump(complaint.query))
+    except Exception as ex:
+        db.session.rollback()
+        return jsonify({"error": str(ex)}), 500
+
+
 
 @app.route("/services/office-devices", methods=["GET"])
 @jwt_required(refresh=True)
