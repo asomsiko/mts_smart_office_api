@@ -1,20 +1,23 @@
 from app import app, db, admin
 from app.models import *
 from flask_admin.contrib.sqla import ModelView
+
+class UserView(ModelView):
+    form_columns = ('name', 'surname', 'patronymic', 'email', 'phone', 'rating', 'state_id')
+    column_list = ('name', 'surname', 'patronymic', 'email', 'phone', 'rating', 'state_id')
 class AdvertisementView(ModelView):
-    form_columns = ('title', 'body', 'customer', 'employer', 'price', 'created_at')
-    column_list = ('title', 'body', 'customer', 'employer', 'price', 'created_at')
+    form_columns = ('title', 'body', 'customer_id', 'employer_id', 'price', 'created_at')
+    column_list = ('title', 'body', 'customer_id', 'employer_id', 'price', 'created_at')
 
 class DeviceView(ModelView):
-    form_columns = ('name', 'api_key', 'location')
-    column_list = ('name', 'api_key', 'location')
+    form_columns = ('name', 'api_key', 'location_id')
+    column_list = ('name', 'api_key', 'location_id')
 
 class ReminderView(ModelView):
     form_columns = ('title', 'body', 'remind_at', 'deadline', 'user_id')
     column_list = ('title', 'body', 'remind_at', 'deadline', 'user_id')
 
 class OrderView(ModelView):
-    
     form_columns = ('title', 'body', 'room_id')
     column_list = ('title', 'body', 'room_id')
 
@@ -28,7 +31,7 @@ class ComplaintView(ModelView):
 
 with app.app_context():
     db.create_all()
-    admin.add_view(ModelView(User, db.session))
+    admin.add_view(UserView(User, db.session))
     admin.add_view(ModelView(State, db.session))
     admin.add_view(AdvertisementView(Advertisement, db.session))
     admin.add_view(ReminderView(Reminder, db.session))
