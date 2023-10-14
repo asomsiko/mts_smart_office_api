@@ -1,6 +1,6 @@
 from app import app, jwt
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import User, State, UserSchema
+from app.models import User, State, UserSchema, Advertisement, AdvertisementSchema
 from flask import jsonify
 import requests
 
@@ -30,12 +30,23 @@ def user_achivements():
 @app.route("/user-profile/orders", methods=["GET"])
 @jwt_required(refresh=True)
 def user_orders():
-    pass
+    user_id = get_jwt_identity()
+    orders = Advertisement.query.filter_by(customer_id=user_id)
+    if not orders:
+        return jsonify(orders='Нет объявлений')
+    ad_schema = AdvertisementSchema(many = True).dump(orders)
+
+    return jsonify(orders=ad_schema)
 
 @app.route("/user-profile/tasks", methods=["GET"])
 @jwt_required(refresh=True)
 def user_tasks():
-    pass
+    user_id = get_jwt_identity()
+    tasks = Advertisement.query.filter_by(employer_id=user_id)
+    if not tasks:
+        return jsonify(tasks='Нет заданий')
+    ad_schema = AdvertisementSchema(many = True).dump(tasks)
+    return jsonify(tasks=ad_schema)
 
 @app.route("/user-profile/settings", methods=["GET", "POST"])
 @jwt_required(refresh=True)
