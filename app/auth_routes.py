@@ -20,6 +20,7 @@ def signup_post():
     state = request.json.get('state').strip()
     password = request.json.get('password').strip()
     confirm_password = request.json.get('confirm_password').strip()
+    is_manager = request.json.get('is_manager')
 
     if password != confirm_password:
         return jsonify(error="Пароли не совпадают"), 400
@@ -38,18 +39,22 @@ def signup_post():
         patronymic=patronymic, 
         phone=phone, 
         rating=rating,
+        is_manager=is_manager
         )
         state = State.query.filter(State.name == state).one_or_none()
         if state is None:
             return jsonify({"error": "Указанный штат отсутствует в системе"})
-        state = state.id
         new_user.state = state
+        new_user.state_id = state.id
         new_user.set_password(password=password)
+        
+
         db.session.add(new_user)
         db.session.commit()
 
         access_token = create_access_token(identity=new_user.id)
         refresh_token = create_refresh_token(identity=new_user.id)
+
 
         return jsonify({"message": "User created", "access_token": access_token, "refresh_token": refresh_token}), 201
     
