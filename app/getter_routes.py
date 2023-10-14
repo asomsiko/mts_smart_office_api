@@ -18,8 +18,8 @@ def get_relax_rooms():
     response = room_chema.dump(query)
     return jsonify(response)
 
-@app.route("/complaints", methods=["GET"])
-def get_complaints():
+@app.route("/complaints/<string:state>", methods=["GET"])
+def get_complaints(state):
     query = Complaint.query.options(joinedload(Complaint.sender), joinedload(Complaint.target)).all()
     complaint_schema = ComplaintSchema(many = True)
     response = complaint_schema.dump(query)
@@ -46,11 +46,11 @@ def get_sorted_orders():
     """
     sort_field = request.args.get('sort')
     if sort_field is None: 
-        query =  Order.query.all()
+        query =  Order.query.options(joinedload(Order.room)).all()
         order_schema = OrderSchema(many = True)
         response = order_schema.dump(query)
         return jsonify(response)
-    query = Order.query.order_by(getattr(Order, sort_field)).all()
+    query = Order.query.options(joinedload(Order.room)).order_by(getattr(Order, sort_field)).all()
     order_schema = OrderSchema(many = True)
     sorted_orders = order_schema.dump(query)
     return jsonify(sorted_orders)
@@ -71,13 +71,13 @@ def get_filtered_orders():
     filter_field = request.args.get('filter')
     filter_value = request.args.get('value')
     if filter_field == None:
-        query =  Order.query.all()
+        query =  Order.query.options(joinedload(Order.room)).all()
         order_schema = OrderSchema(many = True)
         response = order_schema.dump(query)
         return jsonify(response)
     
     elif filter_field == "room_id":
-        filter_value = Room.query.filter(Room.id == filter_value).one_or_none()
+        filter_value = Room.query.options(joinedload(Order.room)).filter(Room.id == filter_value).one_or_none()
         if filter_value is None:
             return jsonify(error="Несуществующая комната")
         filter_value = filter_value.id
@@ -100,11 +100,11 @@ def get_sorted_devices():
     """
     sort_field = request.args.get('sort')
     if sort_field is None: 
-        query =  Device.query.all()
+        query =  Device.query.options(joinedload(Device.location)).all()
         device_schema = DeviceSchema(many = True)
         response = device_schema.dump(query)
         return jsonify(response)
-    query = Device.query.order_by(getattr(Device, sort_field)).all()
+    query = Device.query.options(joinedload(Device.location)).order_by(getattr(Device, sort_field)).all()
     device_schema = DeviceSchema(many = True)
     sorted_devices = device_schema.dump(query)
     return jsonify(sorted_devices)
@@ -126,18 +126,18 @@ def get_filtered_devices():
     filter_field = request.args.get('filter')
     filter_value = request.args.get('value')
     if filter_field is None:
-        query =  Device.query.all()
+        query =  Device.query.options(joinedload(Device.location)).all()
         device_schema = DeviceSchema(many = True)
         response = device_schema.dump(query)
         return jsonify(response)
     
     elif filter_field == "location":
-        filter_value = Room.query.filter(Room.id == filter_value).one_or_none()
+        filter_value = Room.query.options(joinedload(Device.location)).filter(Room.id == filter_value).one_or_none()
         if filter_value is None:
             return jsonify(error="Несуществующая комната")
         filter_value = filter_value.id
 
-    query = Device.query.filter_by(**{filter_field: filter_value}).all()
+    query = Device.query.options(joinedload(Device.location)).filter_by(**{filter_field: filter_value}).all()
     device_schema = DeviceSchema(many = True)
     filtered_devices = device_schema.dump(query)
     return jsonify(filtered_devices)
@@ -155,11 +155,11 @@ def get_sorted_reminders():
     """
     sort_field = request.args.get('sort')
     if sort_field is None: 
-        query =  Reminder.query.all()
+        query =  Reminder.query.options(joinedload(Reminder.owner)).all()
         reminder_schema = ReminderSchema(many = True)
         response = reminder_schema.dump(query)
         return jsonify(response)
-    query = Reminder.query.order_by(getattr(Reminder, sort_field)).all()
+    query = Reminder.query.options(joinedload(Reminder.owner)).order_by(getattr(Reminder, sort_field)).all()
     reminder_schema = ReminderSchema(many = True)
     sorted_reminders = reminder_schema.dump(query)
     return jsonify(sorted_reminders)
@@ -181,18 +181,18 @@ def get_filtered_reminders():
     filter_value = request.args.get('value')
 
     if filter_field is None:
-        query =  Reminder.query.all()
+        query =  Reminder.query.options(joinedload(Reminder.owner)).all()
         reminder_schema = ReminderSchema(many = True)
         response = reminder_schema.dump(query)
         return jsonify(response)
     
     elif filter_field == "user_id":
-        filter_value = User.query.filter(User.id == filter_value).one_or_none()
+        filter_value = User.query.options(joinedload(Reminder.owner)).filter(User.id == filter_value).one_or_none()
         if filter_value is None:
             return jsonify(error="Несуществующий пользователь")
         filter_value = filter_value.id
 
-    query = Reminder.query.filter_by(**{filter_field: filter_value}).all()
+    query = Reminder.query.options(joinedload(Reminder.owner)).filter_by(**{filter_field: filter_value}).all()
     reminder_schema = AdvertisementSchema(many = True)
     filtered_reminders = reminder_schema.dump(query)
     return jsonify(filtered_reminders)
@@ -210,11 +210,11 @@ def get_sorted_advertisements():
     """
     sort_field = request.args.get('sort')
     if sort_field is None: 
-        query =  Advertisement.query.all()
+        query =  Advertisement.query.options(joinedload(Advertisement.customer), joinedload(Advertisement.employer)).all()
         advertisement_schema = AdvertisementSchema(many = True)
         response = advertisement_schema.dump(query)
         return jsonify(response)
-    query = Advertisement.query.order_by(getattr(Advertisement, sort_field)).all()
+    query = Advertisement.query.options(joinedload(Advertisement.customer), joinedload(Advertisement.employer)).order_by(getattr(Advertisement, sort_field)).all()
     advertisement_schema = AdvertisementSchema(many = True)
     sorted_advertisements = advertisement_schema.dump(query)
     return jsonify(sorted_advertisements)
@@ -235,7 +235,7 @@ def get_filtered_advertisements():
     filter_field = request.args.get('filter')
     filter_value = request.args.get('value')
     if filter_field == None:
-        query =  Advertisement.query.all()
+        query =  Advertisement.query.options(joinedload(Advertisement.customer), joinedload(Advertisement.employer)).all()
         advertisement_schema = AdvertisementSchema(many = True)
         response = advertisement_schema.dump(query)
         return jsonify(response)
@@ -252,7 +252,7 @@ def get_filtered_advertisements():
             return jsonify(error="Несуществующий пользователь")
         filter_value = filter_value.id
 
-    query = Advertisement.query.filter_by(**{filter_field: filter_value}).all()
+    query = Advertisement.query.options(joinedload(Advertisement.customer), joinedload(Advertisement.employer)).filter_by(**{filter_field: filter_value}).all()
     advertisement_schema = AdvertisementSchema(many = True)
     filtered_advertisements = advertisement_schema.dump(query)
     return jsonify(filtered_advertisements)
@@ -327,11 +327,11 @@ def get_sorted_users():
     """
     sort_field = request.args.get('sort')
     if sort_field is None: 
-        query =  User.query.all()
+        query =  User.query.options(joinedload(User.state)).all()
         user_schema = UserSchema(many = True)
         response = user_schema.dump(query)
         return jsonify(response)
-    query = User.query.order_by(getattr(User, sort_field)).all()
+    query = User.query.options(joinedload(User.state)).order_by(getattr(User, sort_field)).all()
     user_schema = UserSchema(many = True)
     sorted_users = user_schema.dump(query)
     return jsonify(sorted_users)
@@ -352,7 +352,7 @@ def get_filtered_users():
     filter_field = request.args.get('filter')
     filter_value = request.args.get('value')
     if filter_field is None:
-        query =  User.query.all()
+        query =  User.query.options(joinedload(User.state)).all()
         user_schema = UserSchema(many = True)
         response = user_schema.dump(query)
         return jsonify(response)
@@ -363,7 +363,7 @@ def get_filtered_users():
             return jsonify(error="Несуществующий штат")
         filter_value = filter_value.id
 
-    query = User.query.filter_by(**{filter_field: filter_value}).all()
+    query = User.query.options(joinedload(User.state)).filter_by(**{filter_field: filter_value}).all()
     user_schema = UserSchema(many = True)
     filtered_users = user_schema.dump(query)
     return jsonify(filtered_users)
