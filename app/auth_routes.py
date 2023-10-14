@@ -19,7 +19,10 @@ def signup_post():
     rating = request.json.get('rating')
     state = request.json.get('state').strip()
     password = request.json.get('password').strip()
+    confirm_password = request.json.get('confirm_password').strip()
 
+    if password != confirm_password:
+        return jsonify(error="Пароли не совпадают"), 400
     if not email or not name or not surname or not patronymic or not password or not phone:
         return jsonify({"error": "Missing required fields"}), 400
 
@@ -36,9 +39,10 @@ def signup_post():
         phone=phone, 
         rating=rating,
         )
-        state = State.query.filter(State.name == state).one_or_none().id
+        state = State.query.filter(State.name == state).one_or_none()
         if state is None:
             return jsonify({"error": "Указанный штат отсутствует в системе"})
+        state = state.id
         new_user.state = state
         new_user.set_password(password=password)
         db.session.add(new_user)
