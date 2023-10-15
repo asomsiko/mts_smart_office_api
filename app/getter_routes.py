@@ -72,7 +72,6 @@ def get_complaints(state):
     response = complaint_schema.dump(query)
     return jsonify(response)
 
-
 @app.route("/wishes", methods=["GET"])
 def get_wishes():
     query = Wish.query.all()
@@ -155,7 +154,6 @@ def get_sorted_devices():
     device_schema = DeviceSchema(many = True)
     sorted_devices = device_schema.dump(query)
     return jsonify(sorted_devices)
-
 
 @app.route("/filtered-devices", methods=["GET"])
 def get_filtered_devices():
