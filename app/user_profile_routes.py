@@ -9,6 +9,12 @@ def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data["sub"]
     return User.query.get(identity)
 
+
+@app.route("/user-profile/reminders", methods=["GET"])
+@jwt_required(refresh=True)
+def reminders():
+    pass
+
 @app.route("/user-profile", methods=["GET"])
 @jwt_required(refresh=True)
 def user_profile():

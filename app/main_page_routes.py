@@ -3,11 +3,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import request, jsonify
 from app.models import Complaint, ComplaintSchema, User
 
-@app.route("/services", methods=["GET"])
-@jwt_required(refresh=True)
-def services():
-    pass
-
 @app.route("/services/gpt", methods=["GET"])
 @jwt_required(refresh=True)
 def gpt():
@@ -66,9 +61,4 @@ def office_map():
 @app.route("/services/schedule", methods=["GET"])
 @jwt_required(refresh=True)
 def schedule():
-    pass
-
-@app.route("/services/reminders", methods=["GET"])
-@jwt_required(refresh=True)
-def reminders():
     pass
