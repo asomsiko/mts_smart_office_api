@@ -9,7 +9,7 @@ class User(db.Model):
     patronymic = db.Column(db.String, nullable=False)  # отчество
     email = db.Column(db.String, nullable=False)
     password_hash = db.Column(db.String)
-    phone = db.Column(db.String(11), nullable=False)
+    phone = db.Column(db.String(12), nullable=False)
     rating = db.Column(db.Integer, default=0)
     state_id = db.Column(db.Integer, db.ForeignKey("states.id"))
     state = db.relationship("State", foreign_keys=[state_id])

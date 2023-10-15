@@ -17,11 +17,12 @@ def signup_post():
     patronymic = request.json.get('patronymic').strip()
     phone = request.json.get('phone').strip()
     rating = request.json.get('rating')
-    state = request.json.get('state').strip()
+    state = request.json.get('state').strip().capitalize()
     password = request.json.get('password').strip()
     confirm_password = request.json.get('confirm_password').strip()
     is_manager = request.json.get('is_manager')
-
+    if not (phone.startswith("9") and len(phone) == 10):
+        return jsonify(error="Неправильный формат номера телефона")
     if password != confirm_password:
         return jsonify(error="Пароли не совпадают"), 400
     if not email or not name or not surname or not patronymic or not password or not phone:
@@ -37,7 +38,7 @@ def signup_post():
         name=name, 
         surname=surname, 
         patronymic=patronymic, 
-        phone=phone, 
+        phone="+7"+phone, 
         rating=rating,
         is_manager=is_manager
         )
