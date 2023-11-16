@@ -28,10 +28,10 @@ def user_profile():
         return jsonify(user=response)
 
 
-@app.route("/user-profile/achivements", methods=["GET"])
+@app.route("/user-profile/<id>achivements", methods=["GET"])
 @jwt_required(refresh=True)
-def user_achivements():
-    user_id = get_jwt_identity()
+def user_achivements(id):
+    user_id = id
     achivements_query = Achivement.query.filter_by(user_id=user_id)
     achivement_schema = AchivementSchema(many = True)
     if not achivements_query:
