@@ -39,10 +39,10 @@ def user_achivements():
     achivements = achivement_schema.dump(achivements_query)
     return jsonify(achivements=achivements)
 
-@app.route("/user-profile/orders", methods=["GET"])
+@app.route("/user-profile/<id>/orders", methods=["GET"])
 @jwt_required(refresh=True)
-def user_orders():
-    user_id = get_jwt_identity()
+def user_orders(id):
+    user_id = id
     orders = Advertisement.query.filter_by(customer_id=user_id)
     if not orders:
         return jsonify(orders='Нет объявлений')
@@ -50,17 +50,17 @@ def user_orders():
 
     return jsonify(orders=ad_schema)
 
-@app.route("/user-profile/tasks", methods=["GET"])
+@app.route("/user-profile/<id>/tasks", methods=["GET"])
 @jwt_required(refresh=True)
-def user_tasks():
-    user_id = get_jwt_identity()
+def user_tasks(id):
+    user_id = id
     tasks = Advertisement.query.filter_by(employer_id=user_id)
     if not tasks:
         return jsonify(tasks='Нет заданий')
     ad_schema = AdvertisementSchema(many = True).dump(tasks)
     return jsonify(tasks=ad_schema)
 
-@app.route("/user-profile/settings", methods=["GET", "POST"])
+@app.route("/user-profile/<id>/settings", methods=["GET", "POST"])
 @jwt_required(refresh=True)
-def user_settings():
+def user_settings(id):
     pass
