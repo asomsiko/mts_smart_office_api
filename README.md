@@ -2,16 +2,24 @@
 API для системы умного оффиса. Написано на Flask.
 ## Установка
 1. Клонирование репозитория:
-`git clone https://github.com/muzzy-afk/mtc_smart_office_api`
+```bash
+git clone https://github.com/muzzy-afk/mtc_smart_office_api
+```
 
-2. Установка зависимостей:
-`pip install -r requirements.txt`
+3. Установка зависимостей:
+```bash
+pip install -r requirements.txt
+```
 
-3. Инициализация базы данных:
-`flask db init && flask db migrate && flask db upgrade`
+5. Инициализация базы данных:
+```bash
+flask db init && flask db migrate && flask db upgrade
+```
 ## Использование
 ### Запуск:
-`python3 run.py`
+```bash
+python3 run.py
+```
 ### Роуты:
 #### [Аутентификация](https://github.com/muzzy-afk/mtc_smart_office_api/blob/main/app/auth_routes.py)
 * /login
